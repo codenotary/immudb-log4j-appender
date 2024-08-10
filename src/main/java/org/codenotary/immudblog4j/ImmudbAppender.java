@@ -22,6 +22,7 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.appender.AbstractAppender;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginBuilderAttribute;
+import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.JsonLayout;
 import org.codenotary.immudblog4j.store.StorageService;
 import org.codenotary.immudblog4j.store.VaultStorageService;
@@ -128,6 +129,7 @@ public class ImmudbAppender extends AbstractAppender {
                 Duration.between(Instant.ofEpochSecond(lastSyncAt.get()), Instant.now()).getSeconds() >= syncTimeoutSeconds;
     }
 
+    @PluginFactory
     public static ImmudbAppender createAppender(
             @PluginBuilderAttribute("name") String name,
             @PluginBuilderAttribute("writeToken") String writeToken,
