@@ -66,7 +66,7 @@ public class ImmudbAppender extends AbstractAppender {
                              Integer maxPendingLogs,
                              Integer maxPendingLogsBufferSize,
                              Integer syncTimeoutSeconds
-                                  ) throws MalformedURLException {
+    ) throws MalformedURLException {
         super(name, null, layout, false);
 
         this.storage = storage;
@@ -92,9 +92,9 @@ public class ImmudbAppender extends AbstractAppender {
     }
 
     private void maybeStartSync(int queueSize, int bufferSize) {
-        if(!shouldStartSync(queueSize, bufferSize)) return;
+        if (!shouldStartSync(queueSize, bufferSize)) return;
 
-        if(!syncInProgress.compareAndExchange(false, true)) {
+        if (!syncInProgress.compareAndExchange(false, true)) {
             startSync();
         }
     }
@@ -154,7 +154,7 @@ public class ImmudbAppender extends AbstractAppender {
             @PluginBuilderAttribute("maxPendingLogsBufferSize") Integer maxPendingLogsBufferSize,
             @PluginBuilderAttribute("syncTimeoutSeconds") Integer syncTimeoutSeconds) throws MalformedURLException {
 
-        if(storage == null) {
+        if (storage == null) {
             LOGGER.error("No storage type provided");
             return null;
         }
@@ -166,7 +166,7 @@ public class ImmudbAppender extends AbstractAppender {
                     default -> null;
                 };
 
-        if(storageService == null) {
+        if (storageService == null) {
             LOGGER.error("unknown storage type {}", storage);
             return null;
         }

@@ -56,7 +56,7 @@ public class ImmudbStorageService implements StorageService {
     }
 
     private ImmuClient getClient() {
-        if(client == null) {
+        if (client == null) {
             ImmuClient cli = ImmuClient.newBuilder().
                     withServerUrl(this.host)
                     .withServerPort(this.port)
@@ -70,61 +70,60 @@ public class ImmudbStorageService implements StorageService {
 
     @Override
     public void store(Queue<byte[]> msgQueue) throws IOException {
-        ImmuClient cli = getClient();
-
-        createTableIfNotExists(cli);
+        createTableIfNotExists();
 
         List<byte[]> allMessages = new ArrayList<>(msgQueue);
-        for(int i = 0; i < allMessages.size(); i += BATCH_SIZE) {
-            List<byte[]> batch = allMessages.subList(i, Math.min(allMessages.size(), i+BATCH_SIZE));
-            sendBatch(cli, batch);
+        for (int i = 0; i < allMessages.size(); i += BATCH_SIZE) {
+            List<byte[]> batch = allMessages.subList(i, Math.min(allMessages.size(), i + BATCH_SIZE));
+            sendBatch(batch);
         }
-
     }
 
-    private void sendBatch(ImmuClient cli, List<byte[]> msgBatch) throws IOException {
+    private void sendBatch(List<byte[]> msgBatch) throws IOException {
         String tuples = msgBatch.stream().map(msg -> "('" + new String(msg) + "')")
                 .collect(Collectors.joining(","));
 
-        exec(cli::beginTransaction, false);
-
-        try {
-            exec(() -> cli.sqlExec(String.format("INSERT INTO %s(data) VALUES %s", table, tuples)), false);
-            exec(cli::commitTransaction, false);
-        } finally {
-            exec(cli::rollbackTransaction, true);
-        }
+        exec((cli) -> cli.sqlExec(String.format("INSERT INTO %s(data) VALUES %s", table, tuples)));
     }
 
-    private void createTableIfNotExists(ImmuClient cli) throws IOException {
-        if(tableExists) return;
+    private void createTableIfNotExists() throws IOException {
+        if (tableExists) return;
 
-        exec(cli::beginTransaction, false);
-
-        try {
-            exec(() -> cli.sqlExec(
-                    String.format(
-                            "CREATE TABLE IF NOT EXISTS %s(id INTEGER AUTO_INCREMENT, data JSON, PRIMARY KEY id);",
-                            table
-                    )
-            ), false);
-            exec(cli::commitTransaction, false);
-            tableExists = true;
-        } finally {
-            exec(cli::rollbackTransaction, true);
-        }
+        exec((cli) -> cli.sqlExec(
+                String.format(
+                        "CREATE TABLE IF NOT EXISTS %s(id INTEGER AUTO_INCREMENT, data JSON, PRIMARY KEY id);",
+                        table
+                )
+        ));
+        tableExists = true;
     }
 
     interface SQLStatement {
-        void exec() throws SQLException;
+        void exec(ImmuClient cli) throws SQLException;
     }
 
-    private void exec(SQLStatement stmt, boolean ignoreEx) throws IOException {
+    private void exec(SQLStatement stmt) throws IOException {
+        ImmuClient cli = getClient();
         try {
-          stmt.exec();
+            cli.beginTransaction();
+            stmt.exec(cli);
+            cli.commitTransaction();
         } catch (Exception ex) {
-            if(!ignoreEx)
-                throw new IOException(ex);
+            try {
+                client.rollbackTransaction();
+            } catch (Exception ignored) {
+            }
+
+            stopClient();
+
+            throw new IOException(ex);
+        }
+    }
+
+    private void stopClient() {
+        if (client != null) {
+            client.closeSession();
+            client = null;
         }
     }
 }

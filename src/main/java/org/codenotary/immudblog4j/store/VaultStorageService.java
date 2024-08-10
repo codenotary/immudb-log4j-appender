@@ -33,15 +33,15 @@ public class VaultStorageService implements StorageService {
     public VaultStorageService(String writeToken, String ledger, String collection) {
         this.writeToken = writeToken;
         try {
-            this.vaultURL = URI.create(String.format(URL_PATTERN,  ledger != null ? ledger : "default", collection != null ? collection : "default")).toURL();
+            this.vaultURL = URI.create(String.format(URL_PATTERN, ledger != null ? ledger : "default", collection != null ? collection : "default")).toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void store(Queue<byte[]> msgQueue) throws IOException  {
-        for(byte[] msg : msgQueue) {
+    public void store(Queue<byte[]> msgQueue) throws IOException {
+        for (byte[] msg : msgQueue) {
             storeMsg(msg);
         }
     }
@@ -62,7 +62,7 @@ public class VaultStorageService implements StorageService {
         int code = connection.getResponseCode();
         String message = connection.getResponseMessage();
 
-        if(code != HttpURLConnection.HTTP_OK)
+        if (code != HttpURLConnection.HTTP_OK)
             throw new IOException(String.format("unable to upload log to vault: code=%d, message=%s", code, message));
 
         connection.disconnect();

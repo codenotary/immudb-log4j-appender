@@ -17,9 +17,9 @@ limitations under the License.
 package org.codenotary.immudblog4j;
 
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
@@ -67,7 +67,7 @@ public class ImmudbAppenderTest {
     public void testAppenderTriggeredOnMaxPendingLogBufferSize() throws InterruptedException, MalformedURLException {
         Logger logger = setup(10, 1, null);
 
-        for(int i = 0; i<100; i++) {
+        for (int i = 0; i < 100; i++) {
             logger.info("test message {}", i);
         }
 
@@ -80,7 +80,7 @@ public class ImmudbAppenderTest {
     public void testAppenderTriggeredOnMaxPendingLogs() throws InterruptedException, MalformedURLException {
         Logger logger = setup(10, 1024 * 1024 * 1024, null);
 
-        for(int i = 0; i<109; i++) {
+        for (int i = 0; i < 109; i++) {
             logger.info("test message {}", i);
         }
 
@@ -93,7 +93,7 @@ public class ImmudbAppenderTest {
     public void testAppenderTriggeredOnSyncTimeout() throws InterruptedException, MalformedURLException {
         Logger logger = setup(10000, 1024 * 1024 * 1024, 5);
 
-        for(int i = 0; i<98; i++) {
+        for (int i = 0; i < 98; i++) {
             logger.info("test message {}", i);
         }
 
@@ -121,7 +121,7 @@ public class ImmudbAppenderTest {
         Assert.assertEquals(calls, storage.calls());
 
         int i = 0;
-        for(byte[] msg : storage.getMessages()) {
+        for (byte[] msg : storage.getMessages()) {
             Assert.assertTrue(new String(msg).contains(String.format("test message %d", i++)));
         }
     }
