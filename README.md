@@ -1,6 +1,6 @@
 # immudb-log4j-appender
 
-This repository provides a custom [log4j2 Appender](https://logging.apache.org/log4j/2.x/manual/appenders.html) implementation for sending logs to [immudb](https://immudb.io) and [immudb-vault](https://vault.immudb.io) thus securing them with proof of no tampering.
+This repository provides a custom [log4j2 Appender](https://logging.apache.org/log4j/2.x/manual/appenders.html) implementation for sending logs to [immudb](https://immudb.io) and [immudb-vault](https://vault.immudb.io), thus securing them with proof of no tampering.
 
 Tamperproof log storage ensures data integrity, security, and compliance, while using a ledger database for log storage integrates these benefits with advanced features for querying, analysis, and performance. This combination creates a powerful solution for maintaining reliable, transparent, and secure log data easily using **log4j2**.
 
@@ -43,7 +43,7 @@ dependencies {
 
 ## Configuring the appender
 
-You can configure the appender to either write **immudb** or **immudb vault** by setting up your `log42j.xml` config file as shown below:
+You can configure the appender to either send logs to **immudb** or **immudb vault** by setting up your `log42j.xml` config file as shown below:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -107,7 +107,7 @@ public class Main {
 
 - the number of queued messages exceeds the value of the `maxPendingLogs` parameter (`100` by default);
 - the total amount of queued data (in bytes) exceeds the value of the `maxPendingLogsBufferSize` parameter (`1MB` by default);
-- at least `syncTimeoutSeconds` have passed since the last time the last logs were sent to the storage service (`10 seconds` by default).
+- at least `syncTimeoutSeconds` have passed since the last time logs were sent to the storage service (`10 seconds` by default).
 
 It's important to mention that these conditions are evaluated only when a new log event is intercepted by the appender. As a result, the synchronization of queued data may be delayed during periods of inactivity.
 
