@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-@Plugin(name = "CustomAppender", category = "Core", elementType = Appender.ELEMENT_TYPE, printObject = true)
+@Plugin(name = "ImmudbAppender", category = "Core", elementType = Appender.ELEMENT_TYPE, printObject = true)
 public class ImmudbAppender extends AbstractAppender {
     private static final int MAX_PENDING_LOGS_DEFAULT = 100;
     private static final int MAX_PENDING_LOGS_BUFFER_SIZE_DEFAULT = 1024 * 1024; // 1MB
