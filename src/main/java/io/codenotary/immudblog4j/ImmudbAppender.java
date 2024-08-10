@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.codenotary.immudblog4j;
+package io.codenotary.immudblog4j;
 
 import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Layout;
@@ -24,9 +24,9 @@ import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginBuilderAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.JsonLayout;
-import org.codenotary.immudblog4j.store.ImmudbStorageService;
-import org.codenotary.immudblog4j.store.StorageService;
-import org.codenotary.immudblog4j.store.VaultStorageService;
+import io.codenotary.immudblog4j.store.ImmudbStorageService;
+import io.codenotary.immudblog4j.store.StorageService;
+import io.codenotary.immudblog4j.store.VaultStorageService;
 
 import java.io.Serializable;
 import java.net.MalformedURLException;

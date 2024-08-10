@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package org.codenotary.immudblog4j;
+package io.codenotary.immudblog4j;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -24,7 +24,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.JsonLayout;
-import org.codenotary.immudblog4j.store.MockStorageService;
+import io.codenotary.immudblog4j.store.MockStorageService;
 import org.junit.Assert;
 import org.junit.Test;
 

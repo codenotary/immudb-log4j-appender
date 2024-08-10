@@ -1,4 +1,4 @@
-package org.codenotary.immudblog4j.store;
+package io.codenotary.immudblog4j.store;
 
 import java.util.ArrayList;
 import java.util.List;
