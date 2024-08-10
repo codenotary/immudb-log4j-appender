@@ -24,6 +24,7 @@ import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginBuilderAttribute;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
 import org.apache.logging.log4j.core.layout.JsonLayout;
+import org.codenotary.immudblog4j.store.ImmudbStorageService;
 import org.codenotary.immudblog4j.store.StorageService;
 import org.codenotary.immudblog4j.store.VaultStorageService;
 
@@ -41,6 +42,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 @Plugin(name = "ImmudbAppender", category = "Core", elementType = Appender.ELEMENT_TYPE, printObject = true)
 public class ImmudbAppender extends AbstractAppender {
+    private static final String IMMUDB_STORAGE = "immudb";
+    private static final String VAULT_STORAGE = "immudb-vault";
+
     private static final int MAX_PENDING_LOGS_DEFAULT = 100;
     private static final int MAX_PENDING_LOGS_BUFFER_SIZE_DEFAULT = 1024 * 1024; // 1MB
     private static final int SYNC_TIMEOUT_SECONDS_DEFAULT = 10;
@@ -131,7 +135,18 @@ public class ImmudbAppender extends AbstractAppender {
 
     @PluginFactory
     public static ImmudbAppender createAppender(
+            @PluginBuilderAttribute("storage") String storage,
             @PluginBuilderAttribute("name") String name,
+
+            // immudb storage parameters
+            @PluginBuilderAttribute("host") String host,
+            @PluginBuilderAttribute("port") Integer port,
+            @PluginBuilderAttribute("username") String username,
+            @PluginBuilderAttribute("password") String password,
+            @PluginBuilderAttribute("database") String database,
+            @PluginBuilderAttribute("table") String table,
+
+            // vault storage parameters
             @PluginBuilderAttribute("writeToken") String writeToken,
             @PluginBuilderAttribute("ledger") String ledger,
             @PluginBuilderAttribute("collection") String collection,
@@ -139,23 +154,54 @@ public class ImmudbAppender extends AbstractAppender {
             @PluginBuilderAttribute("maxPendingLogsBufferSize") Integer maxPendingLogsBufferSize,
             @PluginBuilderAttribute("syncTimeoutSeconds") Integer syncTimeoutSeconds) throws MalformedURLException {
 
-        if (name == null) {
-            LOGGER.error("No name provided for ImmudbAppender");
+        if(storage == null) {
+            LOGGER.error("No storage type provided");
             return null;
         }
 
-        if (writeToken == null) {
-            LOGGER.error("No writeToken provided for ImmudbAppender");
+        StorageService storageService =
+                switch (storage) {
+                    case IMMUDB_STORAGE -> createImmudbStorage(host, port, username, password, database, table);
+                    case VAULT_STORAGE -> createVaultStorage(writeToken, ledger, collection);
+                    default -> null;
+                };
+
+        if(storageService == null) {
+            LOGGER.error("unknown storage type {}", storage);
+            return null;
+        }
+
+        if (name == null) {
+            LOGGER.error("No name provided for ImmudbAppender");
             return null;
         }
 
         return new ImmudbAppender(
                 name,
                 JsonLayout.createDefaultLayout(),
-                new VaultStorageService(writeToken, ledger, collection),
+                storageService,
                 maxPendingLogs,
                 maxPendingLogsBufferSize,
                 syncTimeoutSeconds
+        );
+    }
+
+    private static StorageService createVaultStorage(String writeToken, String ledger, String collection) {
+        if (writeToken == null) {
+            LOGGER.error("No writeToken provided for ImmudbAppender");
+            return null;
+        }
+        return new VaultStorageService(writeToken, ledger, collection);
+    }
+
+    private static StorageService createImmudbStorage(String host, Integer port, String username, String password, String database, String table) {
+        return new ImmudbStorageService(
+                host,
+                port,
+                username,
+                password,
+                database,
+                table
         );
     }
 }
